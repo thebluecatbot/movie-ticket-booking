@@ -1,0 +1,45 @@
+class createShow(Resource):
+    method_decorators = [token_required]
+
+    def post(self, current_user):
+        data = request.json
+        show_id = data.get('show_id')
+        show = show.query.filter_by(id=show_id).first()
+
+        if show is None:
+            return make_response(jsonify({'message': 'show not found!'}), 404)
+
+        if not current_user.is_admin :
+            return make_response(jsonify({'message': 'You are not authorized to edit this show!'}), 401)
+
+        # Parse the time data
+        try:
+            time_str = data.get('time', show.time)
+            time = datetime.strptime(time_str, "%H:%M")
+        except:
+            return make_response(jsonify({'message': 'Invalid time format. Please provide time in HH:MM format.', 'status': 'error'}), 400)
+        # Update show attributes based on the data received from the request
+        show.showname = data.get('showname', show.showname)
+        show.time = time=time.strftime("%H:%M")
+        show.rating = data.get('rating', show.rating)
+        show.price = data.get('price', show.price)
+        show.tag = data.get('tag', show.tag)
+
+        db.session.commit()
+
+        selected_theatres = request.form.getlist('theatres')
+        theatres = Theatre.query.filter(Theatre.id.in_(selected_theatres)).all()
+        for theatre_id in selected_theatres:
+            try:
+                theatre = theatre.query.filter_by(id = theatre_id).first()
+                showing = Showing(show_id=show_id, theatre_id=theatre_id, available=theatre.capacity)
+                db.session.add(showing)
+            except:
+                pass
+            db.session.commit()
+        
+        db.session.commit()
+
+        return make_response(jsonify({'message': 'Show created successfully!', 'status': 'success'}), 200)
+# Add the API resources to their respective endpoints
+api.add_resource(createShow, '/api/create_show')

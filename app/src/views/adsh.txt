@@ -1,0 +1,364 @@
+<template>
+  <NavBar></NavBar>
+  <AdminBar></AdminBar>
+  <section class="home-section">
+    <section class="text-gray-600 body-font mt-16">
+      <div class="container py-20 mx-auto flex flex-col">
+        <div class="lg:w-5/6 mx-auto">
+          <div class="flex flex-row mt-10">
+            <!-- Theatres Section -->
+            <div class="sm:w-1/2">
+              <div class="text-center mb-10">
+                <h1
+                  class="sm:text-3xl text-2xl font-medium title-font text-gray-900"
+                >
+                  THEATRES
+                </h1>
+              </div>
+              <div class="leading-relaxed text-lg mb-4">
+                <div class="container px-5 mx-auto flex flex-col bg-gray-100">
+                  <div class="mx-auto">
+                    <div
+                      class="flex flex-col sm:flex-row mt-10 sm:mt-0 py-10 theatre-card"
+                      v-for="theatre in theatres"
+                      :key="theatre.id"
+                    >
+                      <div class="sm:w-1/4 text-center sm:pr-8 sm:py-8">
+                        <div
+                          class="flex flex-col items-center text-center justify-center"
+                        >
+                          <h2
+                            class="font-medium title-font mt-4 text-gray-900 text-lg"
+                          >
+                            {{ theatre.theatrename }}
+                          </h2>
+                          <div
+                            class="w-12 h-1 bg-indigo-500 rounded mt-2 mb-4"
+                          ></div>
+                          <p class="text-base">
+                            Location: {{ theatre.location }}
+                          </p>
+                          <p class="text-base">
+                            Capacity: {{ theatre.capacity }}
+                          </p>
+                        </div>
+                      </div>
+                      <div
+                        class="sm:w-3/4 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left button-group"
+                      >
+                        <span class="text-base">
+                          <a
+                            class="button-44"
+                            role="button"
+                            target="_blank"
+                            :href="'/EditTheatre/' + theatre.id"
+                            ><i class="bx bx-edit-alt"></i>
+                          </a>
+                          <button
+                            class="button-11"
+                            role="button"
+                            @click="deletetheatre(theatre.id)"
+                          >
+                            <i class="bx bxs-trash"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shows Section -->
+            <div
+              class="sm:w-1/2 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left"
+            >
+              <div class="text-center mb-10">
+                <h1
+                  class="sm:text-3xl text-2xl font-medium title-font text-gray-900"
+                >
+                  SHOWS
+                </h1>
+              </div>
+              <div class="leading-relaxed text-lg mb-4">
+                <div class="container px-5 mx-auto flex flex-col bg-gray-100">
+                  <div class="mx-auto">
+                    <div
+                      class="flex flex-col sm:flex-row mt-10 sm:mt-0 py-10 show-card"
+                      v-for="show in shows"
+                      :key="show.id"
+                    >
+                      <div class="sm:w-1/4 text-center sm:pr-8 sm:py-8">
+                        <div
+                          class="flex flex-col items-center text-center justify-center"
+                        >
+                          <h2
+                            class="font-medium title-font mt-4 text-gray-900 text-lg"
+                          >
+                            {{ show.showname }}
+                          </h2>
+                          <div
+                            class="w-12 h-1 bg-indigo-500 rounded mt-2 mb-4"
+                          ></div>
+                          <p class="text-base">Time: {{ show.time }}</p>
+                          <p class="text-base">Rating: {{ show.rating }}</p>
+                          <p class="text-base">Price: {{ show.price }}</p>
+                          <p class="text-base">Tag: {{ show.tag }}</p>
+                        </div>
+                      </div>
+                      <div
+                        class="sm:w-3/4 sm:pl-8 sm:py-8 sm:border-l border-gray-200 sm:border-t-0 border-t mt-4 pt-4 sm:mt-0 text-center sm:text-left button-group"
+                      >
+                        <span class="text-base">
+                          <a
+                            class="button-44"
+                            role="button"
+                            target="_blank"
+                            :href="'/EditShow/' + show.id"
+                            ><i class="bx bx-edit-alt"></i>
+                          </a>
+                          <i class="bx bx-edit-alt"></i>
+
+                          <button
+                            class="button-11"
+                            role="button"
+                            @click="deleteShow(show.id)"
+                          >
+                            <i class="bx bxs-trash"></i>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+</template>
+
+<script>
+import NavBar from "../components/NavBar.vue";
+import AdminBar from "../components/AdminBar.vue";
+
+export default {
+  name: "AdminDashboard",
+  components: {
+    NavBar,
+    AdminBar,
+  },
+  data() {
+    return {
+      theatres: [],
+      shows: [],
+    };
+  },
+  methods: {
+    fetchtheatres() {
+      fetch("http://127.0.0.1:5000/api/theatres", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("ticket_show_token"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            this.theatres = data.theatres;
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+
+    fetchShows() {
+      fetch("http://127.0.0.1:5000/api/shows", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("ticket_show_token"),
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === "success") {
+            this.shows = data.shows;
+            console.log("hi");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:fetychshows", error);
+        });
+    },
+
+    edittheatre(theatre_id) {
+      fetch("http://127.0.0.1:5000/api/edit_theatre", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("ticket_show_token"),
+        },
+        body: JSON.stringify({
+          theatre_id: theatre_id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status == "success") {
+            alert(data["message"]);
+            this.$router.go();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+    deletetheatre(theatre_id) {
+      fetch("http://127.0.0.1:5000/api/delete_theatre", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("ticket_show_token"),
+        },
+        body: JSON.stringify({
+          theatre_id: theatre_id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status == "success") {
+            alert(data["message"]);
+            this.$router.go();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+
+    editShow(show_id) {
+      fetch("http://127.0.0.1:5000/api/edit_show", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("ticket_show_token"),
+        },
+        body: JSON.stringify({
+          show_id: show_id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status == "success") {
+            alert(data["message"]);
+            this.$router.go();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+
+    deleteShow(show_id) {
+      fetch("http://127.0.0.1:5000/api/delete_show", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": localStorage.getItem("ticket_show_token"),
+        },
+        body: JSON.stringify({
+          show_id: show_id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status == "success") {
+            alert(data["message"]);
+            this.$router.go();
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+  },
+
+  created() {
+    // Fetch theatres and shows data when the component is created
+    this.fetchtheatres();
+    this.fetchShows();
+  },
+};
+</script>
+<style scoped>
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-gray-900 {
+  color: #333;
+}
+
+.home-section {
+  background: #f5f7fa;
+  padding: 40px 0;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.theatre-card,
+.show-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.theatre-card img,
+.show-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.theatre-card p,
+.show-card p {
+  margin: 0;
+}
+
+.theatre-card .button-group,
+.show-card .button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.theatre-card .button-group button,
+.show-card .button-group button {
+  border: none;
+  background: #3490dc;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.theatre-card .button-group button:hover,
+.show-card .button-group button:hover {
+  background: #2779bd;
+}
+</style>
