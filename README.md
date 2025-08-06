@@ -1,6 +1,6 @@
-## BlogLite
+## Ticket Master
 
-BlogLite is a simple and lightweight blog sharing platform built using Vue.JS for the frontend and Flask for the backend jobs and API. It utilizes Redis for caching and Celery along with Redis to schedule tasks.
+Ticket Master is a simple and lightweight ticket Booking platform built using Vue.JS for the frontend and Flask for the backend jobs and API. It utilizes Redis for caching and Celery along with Redis to schedule tasks.
 
 ## Features
 
