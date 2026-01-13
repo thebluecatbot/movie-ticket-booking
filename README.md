@@ -1,47 +1,94 @@
-## Ticket Master
+# Ticket Booking Web Application
 
-Ticket Master is a simple and lightweight ticket Booking platform built using Vue.JS for the frontend and Flask for the backend jobs and API. It utilizes Redis for caching and Celery along with Redis to schedule tasks.
+A seat-level ticket booking system built using Flask and SQLite that allows users to browse events, select seats, book tickets, and submit reviews.
 
-## Features
+---
 
--   User registration and login
--   Create and edit blog posts
--   View and search for other users' posts
--   Like posts
-### Technologies Used
+## Overview
 
--   Vue.js: A progressive JavaScript framework for building user interfaces
--   Flask: A micro web framework for Python
--   Redis: An in-memory data structure store used for caching
--   Celery: A distributed task queue for scheduling tasks
--   Mailhog: A simple mail server for testing mailing services
+This project is a web-based ticket booking platform designed for small to medium-scale venues.  
+Users can browse events, select specific seat numbers, and book tickets.  
+Admins can manage venues and events, monitor bookings, and export system data.
 
-### Requirements
+The system focuses on **data integrity**, **transaction safety**, and **role-based access control**.
 
--   Node.js and npm (for building and running the Vue.js frontend)
--   Python 3 and pip (for running the Flask backend)
--   Redis (for caching)
--   Celery (for scheduling tasks)
--   MailHog (For testing mail services)
+---
 
-### Installation
+## Tech Stack
 
-1.  Clone the repository: `git clone https://github.com/shetkarneeraj/BlogLite.git`
-2.  Navigate to the Vue App directory: `cd BlogLite/app`
-3.  Install the frontend dependencies: `npm install`
-4.  Navigate to the API directory: `cd BlogLite/api`
-5.  Install the backend dependencies: `./run_api.sh`
-6.  Start the Celery beats: `celery_beats.sh`
-7.  Start the Celery worker: `celery_worker.sh`
-8.  Activate Virtual Environment: `source ./venv/bin/activate`
-9.  Navigate to the Vue App directory: `cd BlogLite/app`
-10.  Start the Vue development server: `npm run serve`
-11. Run MailHog Server: `~/go/bin/MailHog`
+- Backend: Flask (Python)
+- Database: SQLite
+- ORM: SQLAlchemy
+- Authentication: Flask-Login
+- Frontend: HTML, CSS, Jinja2
+- Background Jobs: Celery
+- Email: SMTP
+- Data Export: CSV
 
-## Deployment
+---
 
-To deploy BlogLite to a production environment, you can use a web server like Nginx or Apache and set up a reverse proxy to the Flask application.
+## Core Features
 
-### Usage
+### Seat-Based Booking
+- Seats are pre-generated per venue (Seat 1, Seat 2, …)
+- Users can book multiple seats in one transaction
+- Each seat has a status: `available` or `booked`
 
-Once the installation and setup is complete, open your browser and navigate to `http://localhost:8080`. You will be prompted to register or login. Once logged in, you can create, edit and view posts, search for other users' posts, and comment and like on posts. You can also schedule post publishing by setting a specific date and time for the post to be published.
+### Overbooking Protection
+Seat booking is handled using database transactions.  
+If two users attempt to book the same seat, only one succeeds.
+
+---
+
+## User Roles
+
+### Admin
+- Create venues and events
+- View seat and booking statistics
+- Export users, events, and bookings as CSV
+
+### Normal User
+- Browse events
+- Select seats
+- Book tickets
+- Leave reviews for booked events
+
+---
+
+## Review System
+
+Users can submit reviews for:
+- Events
+- Venues  
+
+Rules:
+- Only users who booked the event can review
+- Reviews include text + numerical rating
+- Users can edit or delete their own reviews
+- Review prompt emails are sent after booking
+
+---
+
+## Background Jobs
+
+Celery is used for:
+- Booking confirmation emails
+- Review reminder emails  
+All emails are sent asynchronously using SMTP.
+
+---
+
+## Limitations
+
+- Local deployment only
+- No booking cancellation
+- No real-time seat refresh
+- SQLite limits high-concurrency scaling
+- Admin dashboard is read-only
+
+---
+
+## Intended Use
+
+Academic evaluation, demos, and small-scale deployments.
+
